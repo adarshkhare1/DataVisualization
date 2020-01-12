@@ -3,7 +3,9 @@
 
  Initial samples in this repository are from the "Data Visualization" course offered by Rafael Irizarry is a Professor of Biostatistics and Computational Biology at the Dana-Farber Cancer Institute and a Professor of Biostatistics at Harvard Chan School of Public Health.
 
- Professor Rafael Irizarry also offered free online version of textbook "Data Analysis for the Life Sciences" https://leanpub.com/dataanalysisforthelifesciences
+ Professor Rafael Irizarry also offered free online version of textbook 
+ - "Data Analysis for the Life Sciences" https://leanpub.com/dataanalysisforthelifesciences
+ - "Introduction to Data Science" https://rafalab.github.io/dsbook/
 
 # Topics covered in these samples
 - Basic exploratory analysis plots
