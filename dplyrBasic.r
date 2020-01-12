@@ -25,3 +25,15 @@ quantile(heights$height, c(0, 0.5, 1))
 heights %>%
     filter(sex == "Male") %>%
     summarize(range = quantile(height, c(0, 0.5, 1)))
+
+#Demonstrate the use of dot placeholder
+murders <- murders %>% mutate(murder_rate = total/population*100000)
+summarize(murders, mean(murder_rate))
+
+# calculate US murder rate, generating a data frame
+us_murder_rate <- murders %>%
+    summarize(rate = sum(total) / sum(population) * 100000)
+us_murder_rate
+
+# extract the numeric US murder rate with the dot operator
+us_murder_rate %>% .$rate
