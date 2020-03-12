@@ -25,7 +25,7 @@ p <- ggplot(d_plot, aes(x=date, y=value)) + geom_line() +
   labs(y="Number of confirmed cases", x = "Date") +
   theme_economist() + 
   scale_colour_economist() + 
-  ggtitle("Corona confirmed cases over time in US") +
+  ggtitle(paste("Corona confirmed cases over time in ", country)) +
   scale_y_continuous(breaks = round(seq(min(d_plot$value), max(d_plot$value), by = 1000),1)) +
   scale_x_date(date_labels = "%b/%d")
 p
