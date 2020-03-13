@@ -21,12 +21,13 @@ dates <- seq(c(as.Date("2020/1/22")), by = "day", length.out = ncol(d_us))
 d_plot <- data.frame("date"= as.Date(dates), "value"=colSums(d_us))
 
 #create a line plot
+yMarker <- 10^ceiling(log10(max(d_plot$value)/10))
 p <- ggplot(d_plot, aes(x=date, y=value)) + geom_line() + 
   labs(y="Number of confirmed cases", x = "Date") +
   theme_economist() + 
   scale_colour_economist() + 
   ggtitle(paste("Corona confirmed cases over time in ", country)) +
-  scale_y_continuous(breaks = round(seq(min(d_plot$value), max(d_plot$value), by = 1000),1)) +
+  scale_y_continuous(breaks = round(seq(min(d_plot$value), max(d_plot$value), by = yMarker),1)) +
   scale_x_date(date_labels = "%b/%d")
 p
 # plot(tx)
