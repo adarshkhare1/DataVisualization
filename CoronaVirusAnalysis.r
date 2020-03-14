@@ -28,6 +28,8 @@ yMarker <- 10^ceiling(log10(max(sapply(d_sums[-1], max)/20)))
 p <- ggplot(d_sums, aes(x=as.Date(date, origin = "2020/1/22"))) + 
   geom_line(aes_string(y = countries[1]), color = "red") + 
   geom_line(aes_string(y = countries[2]), color = "blue") + 
+  geom_point(aes_string(y=countries[1]), color = "red") +
+  geom_point(aes_string(y=countries[2]), color = "blue") +
   labs(y="Number of confirmed cases", x = "Date") +
   theme_economist() + 
   scale_colour_economist() + 
@@ -35,4 +37,3 @@ p <- ggplot(d_sums, aes(x=as.Date(date, origin = "2020/1/22"))) +
   scale_y_continuous(breaks = round(seq(0, max(sapply(d_sums[-1], max)), by = yMarker),1)) +
   scale_x_date(date_labels = "%b/%d") 
 p
-
