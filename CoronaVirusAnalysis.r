@@ -14,8 +14,7 @@ download.file(download_url, "corona_cases.csv")
 df <- read.csv("corona_cases.csv")
 
 #select countries to plot, support only two countries
-countries <- c("US", "Italy", "Iran", "India")
-#countries <- c("US", "Iran", "Italy")
+countries <- c("Italy", "Spain","France", "US")
 
 #Filter the country only cases
 d_country <- subset(df, select=-c(1,3,4), Country.Region %in% countries & !grepl(".*, .*", Province.State))
@@ -27,7 +26,7 @@ d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
 
 #Create a dataframe for rate of change
-d_trend <- data.frame(diff(data.matrix(d_sums[,-1])))/(d_sums[-length(d_sums),-1])
+d_trend <- 1+data.frame(diff(data.matrix(d_sums[,-1])))/(d_sums[-length(d_sums),-1])
 d_trend <- data.frame(t(d_trend))
 d_trend <- rbind(date=as.Date(dates), d_trend[1:length(countries),])
 
@@ -46,16 +45,15 @@ p1 <- d_sums %>%
 
 d_trend <- data.frame(t(d_trend))
 d_trend <- d_trend %>% gather(countries,key="Country",value="Value", -date)
-d_trend$Value <- replace_na(d_trend$Value, 0)
-#d_trend$Value <- replace(d_trend$Value,Inf,1)
+d_trend$Value <- replace_na(d_trend$Value, 1)
 
 p2 <- d_trend %>% 
   ggplot(aes(x=as.Date(date, origin = "2020/1/1"),y=Value,col=Country,group=Country)) + 
-  geom_smooth(method="loess", formula = y ~ x, se = FALSE) +
-  labs(y="Rate of change", x = "Date") +
+  geom_smooth(method="loess", formula = y ~ x, se = FALSE, size=1) +
+  labs(y="Growth multiplier", x = "Date") +
   theme_economist() + 
   scale_colour_economist() + 
   scale_x_date(date_labels = "%b/%d") 
 
-grid.arrange(p1, p2, nrow = 2, top = "COVID-19 : Confirmed cases and Rate of change")
+grid.arrange(p1, p2, nrow = 2, top = "COVID-19 : Confirmed cases and growth rate")
 
