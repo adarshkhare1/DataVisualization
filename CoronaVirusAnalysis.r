@@ -14,19 +14,22 @@ download.file(download_url, "corona_cases.csv")
 df <- read.csv("corona_cases.csv")
 
 #select countries to plot, support only two countries
-countries <- c("Italy", "Spain","France", "US")
+countries <- c("Italy", "Spain","France", "US", "India")
+
+#countries <- c("India", "Singapore", "Canada", "Australia")
 
 #Filter the country only cases
 d_country <- subset(df, select=-c(1,3,4), Country.Region %in% countries & !grepl(".*, .*", Province.State))
 d_sums <- aggregate(d_country[-1], by=list(Country=d_country$Country.Region), FUN=sum)
 rownames(d_sums) <- d_sums$Country
 d_sums <- d_sums[-1]
-dates <- seq(c(as.Date("2020/1/22")), by = "day", length.out = ncol(d_sums))
+dates <- seq(c(as.Date("2020/1/21")), by = "day", length.out = ncol(d_sums))
 d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
 
 #Create a dataframe for rate of change
-d_trend <- 1+data.frame(diff(data.matrix(d_sums[,-1])))/(d_sums[-length(d_sums),-1])
+#d_trend <- 1+data.frame(diff(data.matrix(d_sums[,-1])))/(d_sums[-length(d_sums),-1])
+d_trend <- data.frame(sapply(select(d_sums,-c(1))[-1, ], as.double))/select(d_sums,-c(1))[-nrow(d_sums),]
 d_trend <- data.frame(t(d_trend))
 d_trend <- rbind(date=as.Date(dates), d_trend[1:length(countries),])
 
