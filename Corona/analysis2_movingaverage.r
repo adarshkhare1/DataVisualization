@@ -36,14 +36,14 @@ d_trend <- data.frame(t(d_trend))
 d_trend <- rbind(date=as.Date(tail(dates,-4)), d_trend[1:length(countries),])
 
 #create a line plot
-yMarker <- 10^ceiling(log10(max(sapply(d_sums[-1], max))))/20
+yMarker <- 10^ceiling(log10(max(d_sums[-1])))/20
 p1 <- d_sums %>% gather(countries,key="Country",value="Value", -date) %>% 
   ggplot(aes(x=as.Date(date, origin = "2020/1/1"),y=Value,col=Country,group=Country)) + 
   geom_line() +
   geom_point() +
   labs(y="Confirmed cases", x = "Date") +
   theme_economist() + 
-  scale_y_continuous(breaks = round(seq(0, max(sapply(d_sums[3], max)), by = yMarker),1)) +
+  scale_y_continuous(breaks = round(seq(0, max(d_sums[-1])), by = yMarker),1)) +
   scale_x_date(date_labels = "%b/%d") 
 
 d_trend <- data.frame(t(d_trend))
