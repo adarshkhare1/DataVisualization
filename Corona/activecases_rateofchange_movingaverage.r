@@ -18,7 +18,8 @@ build_dataframe <- function(cases_file, countries) {
   df_cases <- read.csv("corona_cases.csv")
   df_cases <- subset(df_cases, select=-c(1,3,4,5:43), Country.Region %in% countries & !grepl(".*, .*", Province.State))
   df_cases <- aggregate(df_cases[-1], by=list(Country=df_cases$Country.Region), FUN=sum)
-  df_cases
+  rownames(df_cases) <- df_cases$Country
+  df_cases[-1]
 }
 
 #select countries to plot, support only two countries
@@ -31,8 +32,7 @@ df_confirmed <- build_dataframe("time_series_covid19_confirmed_global.csv", coun
 df_recovered <- build_dataframe("time_series_covid19_recovered_global.csv", countries)
 
 #Calculate active cases and add date row
-d_sums <- df_confirmed[-1] - df_recovered[-1]
-rownames(d_sums) <- df_confirmed$Country
+d_sums <- df_confirmed - df_recovered
 dates <- seq(c(as.Date("2020/3/1")), by = "day", length.out = ncol(d_sums))
 d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
