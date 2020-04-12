@@ -38,7 +38,6 @@ d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
 
 #Create a dataframe for rate of change
-d_diff <- data.frame(diff(data.matrix(d_sums[,-1])))
 d_trend <- ma(d_sums[-1,-1]/d_sums[-nrow(d_sums),-1],5)[-1:-5,]
 colnames(d_trend) <- colnames(d_sums)[-1]
 d_trend <- data.frame(t(d_trend))
