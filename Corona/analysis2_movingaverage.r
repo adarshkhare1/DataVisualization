@@ -13,11 +13,6 @@ setwd(dirname(getActiveDocumentContext()$path ))
 #print( getwd() )
 source("./covid19_functions.r")
 
-#download the data file
-download_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-download.file(download_url, "corona_cases.csv")
-df <- read.csv("corona_cases.csv")
-
 #select countries to plot, support only two countries
 #countries <- c ("US", "Italy", "Germany", "Spain", "France")
 
