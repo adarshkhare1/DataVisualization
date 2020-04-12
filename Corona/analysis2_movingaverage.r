@@ -6,9 +6,12 @@ require(ggthemes)
 require(scales)
 require(tidyverse)
 require(gridExtra)
-rm(list = ls())
+require(rstudioapi)
 
-ma <- function(x,n=5){stats::filter(x,rep(1/n,n), sides=1)}
+rm(list = ls())
+setwd(dirname(getActiveDocumentContext()$path ))
+#print( getwd() )
+source("./covid19_functions.r")
 
 #download the data file
 download_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
@@ -20,11 +23,10 @@ df <- read.csv("corona_cases.csv")
 
 countries <- c("India", "Singapore", "Malaysia", "Japan", "Thailand")
 
-#Filter the country only cases
-d_country <- subset(df, select=-c(1,3,4,5:43), Country.Region %in% countries & !grepl(".*, .*", Province.State))
-d_sums <- aggregate(d_country[-1], by=list(Country=d_country$Country.Region), FUN=sum)
-rownames(d_sums) <- d_sums$Country
-d_sums <- d_sums[-1]
+#download the data file
+d_sums <- build_dataframe("time_series_covid19_confirmed_global.csv", countries)
+
+#Add dates 
 dates <- seq(c(as.Date("2020/3/1")), by = "day", length.out = ncol(d_sums))
 d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
@@ -43,7 +45,7 @@ p1 <- d_sums %>% gather(countries,key="Country",value="Value", -date) %>%
   geom_point() +
   labs(y="Confirmed cases", x = "Date") +
   theme_economist() + 
-  scale_y_continuous(breaks = round(seq(0, max(d_sums[-1])), by = yMarker),1)) +
+  scale_y_continuous(breaks = round(seq(0, max(d_sums[-1]), by = yMarker),1)) +
   scale_x_date(date_labels = "%b/%d") 
 
 d_trend <- data.frame(t(d_trend))
@@ -58,4 +60,3 @@ p2 <- d_trend %>% gather(countries,key="Country",value="Value", -date) %>%
   scale_x_date(date_labels = "%b/%d") 
 
 grid.arrange(p1, p2, nrow = 2, top = "COVID-19:Confirmed cases and growth rate (Data Source- Johns Hopkins JHU CCSE)")
-
