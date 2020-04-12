@@ -6,21 +6,12 @@ require(ggthemes)
 require(scales)
 require(tidyverse)
 require(gridExtra)
+require(rstudioapi) # make sure you have it installed
+
 rm(list = ls())
-
-ma <- function(x,n=5){stats::filter(x,rep(1/n,n), sides=1)}
-
-# Download data file from JHU github url and build filtered dataframe
-build_dataframe <- function(cases_file, countries) {
-  base_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
-  cases_url <- paste(base_url,cases_file, sep = "")
-  download.file(cases_url, "corona_cases.csv")
-  df_cases <- read.csv("corona_cases.csv")
-  df_cases <- subset(df_cases, select=-c(1,3,4,5:43), Country.Region %in% countries & !grepl(".*, .*", Province.State))
-  df_cases <- aggregate(df_cases[-1], by=list(Country=df_cases$Country.Region), FUN=sum)
-  rownames(df_cases) <- df_cases$Country
-  df_cases[-1]
-}
+setwd(dirname(getActiveDocumentContext()$path ))
+#print( getwd() )
+source("./covid19_functions.r")
 
 #select countries to plot, support only two countries
 countries <- c ("US", "Italy", "Germany", "Spain", "France", "China")
@@ -66,4 +57,5 @@ p2 <- d_trend %>% gather(countries,key="Country",value="Value", -date) %>%
   scale_x_date(date_labels = "%b/%d") 
 
 grid.arrange(p1, p2, nrow = 2, top = "COVID-19 : Active cases and growth rate (Data Source- Johns Hopkins JHU CCSE)")
+
 
