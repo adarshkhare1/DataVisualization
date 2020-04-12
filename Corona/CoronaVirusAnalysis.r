@@ -6,24 +6,20 @@ require(ggthemes)
 require(scales)
 require(tidyverse)
 require(gridExtra)
-rm(list = ls())
+require(rstudioapi)
 
-#download the data file
-#download_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-download_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-download.file(download_url, "corona_cases.csv")
-df <- read.csv("corona_cases.csv")
+rm(list = ls())
+setwd(dirname(getActiveDocumentContext()$path ))
+#print( getwd() )
+source("./covid19_functions.r")
 
 #select countries to plot, support only two countries
 #countries <- c ("US", "Italy", "Germany", "France", "China")
 
 countries <- c("India", "Singapore", "Australia", "Japan")
 
-#Filter the country only cases
-d_country <- subset(df, select=-c(1,3,4,5:29), Country.Region %in% countries & !grepl(".*, .*", Province.State))
-d_sums <- aggregate(d_country[-1], by=list(Country=d_country$Country.Region), FUN=sum)
-rownames(d_sums) <- d_sums$Country
-d_sums <- d_sums[-1]
+#download the data file
+d_sums <- build_dataframe("time_series_covid19_confirmed_global.csv", countries)
 dates <- seq(c(as.Date("2020/2/16")), by = "day", length.out = ncol(d_sums))
 d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
@@ -45,8 +41,8 @@ p1 <- d_sums %>% gather(countries,key="Country",value="Value", -date) %>%
   scale_x_date(date_labels = "%b/%d") 
 
 d_trend <- data.frame(t(d_trend))
-d_trend$Value <- replace_na(d_trend$Value, 1)
-d_trend$Value[is.infinite(d_trend$Value)] <- 1 
+#d_trend$Value <- replace_na(d_trend$Value, 1)
+#d_trend$Value[is.infinite(d_trend$Value)] <- 1 
 
 p2 <- d_trend %>% gather(countries,key="Country",value="Value", -date) %>% 
   ggplot(aes(x=as.Date(date, origin = "2020/1/1"),y=Value,col=Country,group=Country)) + 
