@@ -15,15 +15,16 @@ source("./covid19_functions.r")
 
 #select countries to plot, support only two countries
 countries <- c ("US", "Italy", "Germany", "Spain", "France", "China")
-#countries <- c ("India", "Russia", "Australia", "Brazil", "Canada")
-#countries <- c("India", "Singapore", "Malaysia", "Japan", "Thailand")
+#countries <- c ("India", "Russia", "Australia", "Brazil", "Canada", "Iran")
+#countries <- c("India", "Singapore", "Malaysia", "Japan", "Thailand", "Iran")
 
 #download the data file
 df_confirmed <- build_dataframe("time_series_covid19_confirmed_global.csv", countries)
 df_recovered <- build_dataframe("time_series_covid19_recovered_global.csv", countries)
+df_deaths <- build_dataframe("time_series_covid19_deaths_global.csv", countries)
 
 #Calculate active cases and add date row
-d_sums <- df_confirmed - df_recovered
+d_sums <- df_confirmed - df_recovered - df_deaths
 dates <- seq(c(as.Date("2020/3/1")), by = "day", length.out = ncol(d_sums))
 d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
 d_sums <- data.frame(t(d_sums))
