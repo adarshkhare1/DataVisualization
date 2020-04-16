@@ -14,9 +14,9 @@ setwd(dirname(getActiveDocumentContext()$path ))
 source("./covid19_functions.r")
 
 #select countries to plot, support only two countries
-countries <- c ("US", "Italy", "Germany", "Spain", "France", "China")
-#countries <- c ("India", "Russia", "Australia", "Brazil", "Canada", "Iran")
-#countries <- c("India", "Singapore", "Malaysia", "Japan", "Thailand", "Iran")
+#countries <- c ("US", "Italy", "Germany", "Spain", "France", "China")
+#countries <- c ("India", "Russia", "Brazil", "Canada", "Iran")
+countries <- c("India", "Singapore", "Malaysia", "Japan", "Thailand")
 
 #download the data file
 df_confirmed <- build_dataframe("time_series_covid19_confirmed_global.csv", countries)
@@ -41,12 +41,12 @@ d_trend <- data.frame(t(d_trend))
 yMarker <- 10^ceiling(log10(max(d_sums[-1])))/20
 p1 <- get_base_plot(d_sums, "Active cases") +
   scale_y_continuous(breaks = round(seq(0, max(d_sums[-1]), by = yMarker),1)) +
-  geom_line() +
-  geom_point() 
+  geom_line(size=0.5) +
+  geom_point(size=0.75) 
 
 #create a smoothen line plot for growth rate multiplier moving average
 p2 <- get_base_plot(d_trend, "(5 day moving average) growth multiplier") +
-  geom_smooth(method="loess", formula = y ~ x, se = FALSE)
+  geom_smooth(method="loess", formula = y ~ x, se = FALSE, size=0.6)
 
 grid.arrange(p1, p2, nrow = 2, top = "COVID-19 : Active cases and growth rate (Data Source- Johns Hopkins JHU CCSE)")
 
