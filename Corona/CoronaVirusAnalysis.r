@@ -1,48 +1,28 @@
-require(datasets)
-require(stats)
-require(RCUrl)
-require(ggplot2)
-require(ggthemes)
-require(scales)
-require(tidyverse)
-require(gridExtra)
-require(rstudioapi)
 
-rm(list = ls())
-setwd(dirname(getActiveDocumentContext()$path ))
-#print( getwd() )
-source("./covid19_functions.r")
+#file containing functions for Covid-19 analysis
 
-#select countries to plot, support only two countries
-#countries <- c ("US", "Italy", "Germany", "France", "China")
+#calculate moving average
+ma <- function(x,n=5){stats::filter(x,rep(1/n,n), sides=1)}
 
-countries <- c("India", "Singapore", "Australia", "Japan")
+# Download data file from JHU github url and build filtered dataframe
+build_dataframe <- function(cases_file, countries) {
+  base_url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
+  cases_url <- paste(base_url,cases_file, sep = "")
+  download.file(cases_url, "corona_cases.csv")
+  df_cases <- read.csv("corona_cases.csv")
+  df_cases$Country.Region <- gsub(' ', '_', df_cases$Country.Region)
+  df_cases <- subset(df_cases, select=-c(1,3,4,5:57), Country.Region %in% countries & !grepl(".*, .*", Province.State))
+  df_cases <- aggregate(df_cases[-1], by=list(Country=df_cases$Country.Region), FUN=sum)
+  df_cases$Country <- gsub(' ', '_', df_cases$Country)
+  rownames(df_cases) <- df_cases$Country
+  df_cases[-1]
+}
 
-#download the data file
-d_sums <- build_dataframe("time_series_covid19_confirmed_global.csv", countries)
-dates <- seq(c(as.Date("2020/2/16")), by = "day", length.out = ncol(d_sums))
-d_sums <- rbind(date=as.Date(dates), d_sums[1:length(countries),])
-d_sums <- data.frame(t(d_sums))
-
-#Create a dataframe for rate of change
-d_trend <- d_sums[-1,-1]/d_sums[-nrow(d_sums),-1]
-d_trend <- data.frame(t(d_trend))
-d_trend <- rbind(date=as.Date(dates), d_trend[1:length(countries),])
-
-#create a line plot
-yMarker <- 10^ceiling(log10(max(d_sums[-1])))/20
-p1 <- get_base_plot(d_sums, "Confirmed cases") +
-  scale_y_continuous(breaks = round(seq(0, max(d_sums[-1]), by = yMarker),1)) +
-  geom_line() +
-  geom_point() 
-
-d_trend <- data.frame(t(d_trend))
-#d_trend$Value <- replace_na(d_trend$Value, 1)
-#d_trend$Value[is.infinite(d_trend$Value)] <- 1 
-
-#create a smoothen line plot for growth rate multiplier trend
-p2 <- get_base_plot(d_trend, "Day over day growth multiplier") +
-  geom_smooth(method="loess", formula = y ~ x, se = FALSE)
-
-grid.arrange(p1, p2, nrow = 2, top = "COVID-19 : Confirmed cases and growth rate")
-
+get_base_plot <- function(d_series, yLabel) {
+  p <- d_series %>% gather(countries,key="Country",value="Value", -date) %>% 
+    ggplot(aes(x=as.Date(date, origin = "2020/1/1"),y=Value,col=Country,group=Country)) + 
+    labs(y=yLabel, x = "") +
+    theme_economist() + 
+    scale_x_date(date_labels = "%b/%d")
+  p
+}
