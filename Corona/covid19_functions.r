@@ -1,3 +1,4 @@
+
 #file containing functions for Covid-19 analysis
 
 #calculate moving average
@@ -22,6 +23,6 @@ get_base_plot <- function(d_series, yLabel) {
     ggplot(aes(x=as.Date(date, origin = "2020/1/1"),y=Value,col=Country,group=Country)) + 
     labs(y=yLabel, x = "") +
     theme_economist() + 
-    scale_x_date(date_labels = "%b/%d")
+    scale_x_date(date_labels = "%b %y", date_breaks = "1 month")
   p
 }
